@@ -114,7 +114,8 @@ function roleSection(view: PlayerView): string {
         'Your investigations are completely SECRET: no other player — NOT EVEN the werewolves — knows what you have learned, or even that you are the Seer, unless you reveal it yourself. Never assume anyone else shares your knowledge.',
         'Each night you secretly learn one player\'s true role. These facts are CERTAIN. What you have confirmed so far:',
         findings,
-        'Treat everyone you have confirmed as settled fact — never doubt, suspect, or vote against a player you confirmed innocent, and never trust one you confirmed is a werewolf.',
+        'Your results are PERMANENT and INFALLIBLE: an investigation is NEVER "faulty" or mistaken, and werewolves CANNOT fake, plant, or change a Seer result. A player you confirmed innocent stays innocent for the WHOLE game — even if they later act suspicious, argue badly, push hard, go quiet, or look guilty, that is just an innocent playing imperfectly, NEVER a reason to doubt your own confirmation. So never invent excuses like "maybe my read was wrong" or "maybe the wolves faked it" — they cannot.',
+        'Therefore: NEVER vote for, accuse, or turn on a player you confirmed INNOCENT, no matter what — and if the village starts piling on someone you cleared, you KNOW the accusers are wrong, so DEFEND that player (reveal what you know if that is what it takes to save them) rather than joining the lynch. Likewise never trust a player you confirmed is a werewolf.',
         'You are the village\'s only source of hard facts — powerful, but only if you use it. Each day, weigh how to play what you know: push the vote toward someone you have CONFIRMED is a werewolf, defend or vouch for a player you have cleared when suspicion turns on them unfairly, drop a careful hint, or stay hidden for now. The trade-offs are real — openly claiming to be the Seer makes you the werewolves\' top target the very next night, but sitting silently on what you know lets confirmed wolves survive and your cleared allies get lynched. The choice and the timing are entirely yours.',
         'Your whole edge is CERTAINTY, so lean on what you have actually confirmed rather than guessing on hunches like everyone else. Do not lead or join a lynch of a player you know nothing about on a vibe — if you have no confirmed werewolf to push yet, the most valuable thing you can do is keep investigating to FIND one (look at your strongest still-unknown suspects), not gamble the village\'s vote.',
         'You win when every werewolf has been eliminated.',
@@ -224,9 +225,11 @@ function gameSoFar(view: PlayerView): string {
 // only — no advice on how to use them. Empty for a plain villager.
 function privateReminder(view: PlayerView): string {
   if (view.self.role === 'seer' && view.seerFindings.length > 0) {
-    return `Reminder — you have secretly confirmed: ${view.seerFindings
+    return `Reminder — you have CONFIRMED these roles for certain (permanent and infallible): ${view.seerFindings
       .map((f) => `${f.player.name} = ${f.role}`)
-      .join('; ')}.`;
+      .join(
+        '; ',
+      )}. NEVER vote for, accuse, or doubt anyone you confirmed INNOCENT — not even if they look or sound suspicious now (an innocent can argue badly; your result still stands). If one is being piled on, DEFEND them. Never trust anyone you confirmed is a werewolf.`;
   }
   if (view.self.role === 'werewolf' && view.werewolfAllies.length > 0) {
     const allies = view.werewolfAllies.map((a) => a.name).join(', ');

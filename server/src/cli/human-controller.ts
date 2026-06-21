@@ -8,7 +8,7 @@ import { Say } from './narrator';
 import { renderHeader, renderPlayerView } from './render';
 
 // Lets a human play one seat from the terminal. Shows ONLY that player's own view
-// (role, private knowledge, who's alive) via buildPlayerView — never god info. The
+// (role, private knowledge, who's alive) via buildPlayerView — never the all-revealing view. The
 // running public commentary (NPC speeches, votes) is streamed separately by the
 // game observer. Legal targets come from the shared helpers, so the human is
 // offered exactly what the engine will accept. Output goes through `say` (whose

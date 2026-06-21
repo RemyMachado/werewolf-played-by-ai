@@ -5,11 +5,11 @@ import { Choice, Prompter } from './prompt';
 import { Say } from './narrator';
 import { renderHeader, renderRecentLog, renderRoster } from './render';
 
-// A single CLI controller that answers for every player in "god mode": it reveals
+// A single CLI controller that answers for every player in "testing mode": it reveals
 // all roles and hidden info. Built for hand-testing the engine, not real play —
 // the real game routes each player to its own controller (human vs NPC).
 // Uses `prompter` for input (menus/text) and `say` for output (colors names).
-export class GodModeController implements PlayerController {
+export class TestingController implements PlayerController {
   constructor(
     private readonly prompter: Prompter,
     private readonly say: Say,
@@ -18,7 +18,7 @@ export class GodModeController implements PlayerController {
   private showContext(state: GameState): void {
     this.say('\n' + renderHeader(state));
     this.say(renderRoster(state, true));
-    const log = renderRecentLog(state, 12, true); // god mode reveals all roles
+    const log = renderRecentLog(state, 12, true); // testing mode reveals all roles
     if (log) this.say('\n' + log);
   }
 

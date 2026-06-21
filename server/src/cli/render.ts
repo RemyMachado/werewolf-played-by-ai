@@ -16,7 +16,7 @@ function roleColored(role: Role): string {
   return paintByRole(ROLE_META[role].displayName, role);
 }
 
-// One emoji per role, used to tag who is thinking/speaking in watch & god mode
+// One emoji per role, used to tag who is thinking/speaking in watch & testing mode
 // (where roles are already revealed). Never shown to a human player — see the
 // `reveal` gate in renderLogEntry and the thought observer (watch/eval only).
 const ROLE_EMOJI: Record<Role, string> = {
@@ -87,7 +87,7 @@ export function renderLogEntry(entry: LogEntry, players: Player[], reveal: boole
   switch (entry.type) {
     case 'speech': {
       // A leading blank line + a marker so a player SPEAKING is as visually distinct
-      // as a player THINKING is in watch mode. When roles are revealed (watch/god)
+      // as a player THINKING is in watch mode. When roles are revealed (watch/testing)
       // the marker is the speaker's role emoji; for a human player it stays a neutral
       // 💬 so their living role is never leaked.
       const speaker = players.find((p) => p.id === entry.playerId);

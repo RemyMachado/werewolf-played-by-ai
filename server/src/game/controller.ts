@@ -16,7 +16,7 @@ export interface PlayerController {
   chooseInvestigation(state: GameState, seer: Player): Promise<string>;
   // After the engine has revealed the investigated player's role, the seer reflects
   // on what she just learned and updates her memory. Optional — only controllers with
-  // private memory (NPC) implement it; the human/god seer already sees the result.
+  // private memory (NPC) implement it; the human/testing seer already sees the result.
   reflectOnInvestigation?(state: GameState, seer: Player, investigated: Player): Promise<void>;
   // The witch, having seen the wolves' victim, decides whether to use her one-time
   // healing potion to save them. Optional — controllers without a witch omit it.
@@ -30,6 +30,6 @@ export interface PlayerController {
   // Optional private reflection after a death: the player updates its memory based
   // on what happened. `cause` says how the deceased died (lynched vs killed in the
   // night), which the reflection is framed around. No public output. Controllers
-  // without private memory (human, god) simply omit it.
+  // without private memory (human, testing) simply omit it.
   reflect?(state: GameState, player: Player, deceased: Player, cause: 'vote' | 'night-kill' | 'poison'): Promise<void>;
 }

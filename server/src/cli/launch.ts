@@ -4,7 +4,7 @@ import { GameConfig } from '../types/game';
 import { PRESETS, buildPlayers } from '../game/presets';
 import { RoutingController } from '../game/routing-controller';
 import { NpcController } from '../npc/npc-controller';
-import { GodModeController } from './god-controller';
+import { TestingController } from './testing-controller';
 import { HumanController } from './human-controller';
 import { Prompter } from './prompt';
 import { makeSay } from './narrator';
@@ -15,7 +15,7 @@ import { bold, dim } from './style';
 
 // Interactive launcher: pick a mode and a player-count preset, then play.
 // Flags: --model=<name> (default gemma4:e4b), --base=<url>.
-type Mode = 'human' | 'watch' | 'god';
+type Mode = 'human' | 'watch' | 'testing';
 
 function argValue(flag: string): string | undefined {
   return process.argv.find((a) => a.startsWith(`${flag}=`))?.slice(flag.length + 1);
@@ -45,7 +45,7 @@ async function main(): Promise<void> {
     const mode = await prompter.select<Mode>('Choose a game mode:', [
       { label: 'Play against the NPCs', value: 'human' },
       { label: 'Watch the NPCs play each other', value: 'watch' },
-      { label: 'God mode — control every player yourself', value: 'god' },
+      { label: 'Testing mode — control every player yourself', value: 'testing' },
     ]);
 
     const preset = await prompter.select(
@@ -63,10 +63,10 @@ async function main(): Promise<void> {
 
     const print = (s: string) => prompter.print(s);
 
-    // God mode needs no model and prints its own context, so no observer.
-    if (mode === 'god') {
+    // Testing mode needs no model and prints its own context, so no observer.
+    if (mode === 'testing') {
       const say = makeSay(print, state.players, true);
-      const final = await runGame(state, new GodModeController(prompter, say), { wolfTalkRounds, debateRounds });
+      const final = await runGame(state, new TestingController(prompter, say), { wolfTalkRounds, debateRounds });
       say(renderOutcome(final));
       return;
     }

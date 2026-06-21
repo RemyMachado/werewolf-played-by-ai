@@ -11,7 +11,7 @@ import { renderOutcome, renderRoles } from './render';
 import { bold, dim } from './style';
 
 // Watches an all-NPC game play out against a local Ollama model — the analog of
-// god-mode, but every seat is the LLM. Flags: --seed=<n>, --model=<name>,
+// testing mode, but every seat is the LLM. Flags: --seed=<n>, --model=<name>,
 // --base=<url>, --players=<n>, --wolves=<n>, --witch / --no-witch (defaults on for
 // 8+ players, the official threshold). For interactive setup use `launch`.
 function argValue(flag: string): string | undefined {

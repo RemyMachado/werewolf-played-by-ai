@@ -2,13 +2,13 @@ import { createGame } from '../game/state';
 import { runGame } from '../game/orchestrator';
 import { GameConfig } from '../types/game';
 import { Rng, seededRng } from '../game/rng';
-import { GodModeController } from './god-controller';
+import { TestingController } from './testing-controller';
 import { Prompter } from './prompt';
 import { makeSay } from './narrator';
 import { renderOutcome, renderRecentLog } from './render';
 import { bold } from './style';
 
-// God-mode hotseat: you control every player and see all hidden info. A harness
+// Testing-mode hotseat: you control every player and see all hidden info. A harness
 // for hand-testing the engine, not the real game. Pass --seed=<n> to make role
 // assignment and tie-breaks reproducible.
 const config: GameConfig = {
@@ -36,11 +36,11 @@ async function main(): Promise<void> {
   try {
     const initial = createGame(config, rng);
     const say = makeSay((s) => prompter.print(s), initial.players, true);
-    const final = await runGame(initial, new GodModeController(prompter, say));
+    const final = await runGame(initial, new TestingController(prompter, say));
 
     say(renderOutcome(final));
     say('\n' + bold('Full log:'));
-    say(renderRecentLog(final, final.log.length, true)); // god mode reveals all roles
+    say(renderRecentLog(final, final.log.length, true)); // testing mode reveals all roles
   } finally {
     prompter.close();
   }

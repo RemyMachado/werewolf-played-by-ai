@@ -1,55 +1,40 @@
-// Server entry point — Phase 4 will wire up Express + WebSocket here.
-// For now: smoke-test the game engine end-to-end.
+// Server entry point: connects to Ollama, then serves the single-player game API
+// (SSE event stream + HTTP answers) that a browser client plays through.
+//
+//   pnpm --filter server dev   (or: tsx src/index.ts)
+//
+// Flags (same conventions as the CLI runners):
+//   --model=<name>   Ollama model (default gemma4:e4b)
+//   --base=<url>     Ollama base URL (default http://localhost:11434)
+//   --ctx=<n>        context window override
+//   --port=<n>       HTTP port (default 3000)
+//   --wolf-talk-rounds=<n> / --debate-rounds=<n>   per-game defaults
 
-import { startGame, recordSpeech, recordVote, resolveNight, setNightKillTarget, setNightInvestigateTarget } from './game/engine';
-import { createGame } from './game/state';
+import { connectOllama } from './cli/ollama-setup';
+import { createServer } from './api/server';
 
-const state0 = createGame({
-  players: [
-    { id: 'p1', name: 'Alice', isHuman: true },
-    { id: 'p2', name: 'Bob', isHuman: false },
-    { id: 'p3', name: 'Charlie', isHuman: false },
-    { id: 'p4', name: 'Diana', isHuman: false },
-    { id: 'p5', name: 'Eve', isHuman: false },
-  ],
-  werewolfCount: 1,
+function argValue(flag: string): string | undefined {
+  return process.argv.find((a) => a.startsWith(`${flag}=`))?.slice(flag.length + 1);
+}
+
+async function main(): Promise<void> {
+  const baseUrl = argValue('--base') ?? 'http://localhost:11434';
+  const model = argValue('--model') ?? 'gemma4:e4b';
+  const numCtx = argValue('--ctx') ? Number(argValue('--ctx')) : undefined;
+  const port = argValue('--port') ? Number(argValue('--port')) : 3000;
+  const wolfTalkRounds = argValue('--wolf-talk-rounds') ? Number(argValue('--wolf-talk-rounds')) : undefined;
+  const debateRounds = argValue('--debate-rounds') ? Number(argValue('--debate-rounds')) : undefined;
+
+  // Fail fast with clear guidance if Ollama or the model is missing, before binding.
+  const client = await connectOllama(baseUrl, model, numCtx);
+
+  const app = createServer(client, { wolfTalkRounds, debateRounds });
+  app.listen(port, () => {
+    console.log(`Werewolf server listening on http://localhost:${port} (model: ${model})`);
+  });
+}
+
+main().catch((err) => {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
 });
-
-console.log('Roles assigned:');
-for (const p of state0.players) {
-  console.log(`  ${p.name}: ${p.role}`);
-}
-
-const werewolf = state0.players.find((p) => p.role === 'werewolf')!;
-const seer = state0.players.find((p) => p.role === 'seer')!;
-const villagers = state0.players.filter((p) => p.role === 'villager');
-
-// Night 1
-let state = startGame(state0);
-console.log('\nPhase:', state.phaseData.phase);
-
-state = setNightInvestigateTarget(state, seer.id, werewolf.id); // seer investigates werewolf
-state = setNightKillTarget(state, werewolf.id, villagers[0].id); // werewolf kills first villager
-state = resolveNight(state);
-console.log('Phase after night:', state.phaseData.phase);
-console.log('Seer knows:', state.seerKnowledge);
-console.log('Alive:', state.players.filter((p) => p.isAlive).map((p) => p.name));
-
-// Day debate
-for (const p of state.players.filter((p) => p.isAlive)) {
-  state = recordSpeech(state, p.id, `${p.name} says something.`);
-}
-console.log('Phase after speeches:', state.phaseData.phase);
-
-// Day vote — everyone votes for the werewolf
-for (const p of state.players.filter((p) => p.isAlive && p.id !== werewolf.id)) {
-  state = recordVote(state, p.id, werewolf.id);
-}
-// Werewolf votes for a random alive player
-const werewolfVoteTarget = state.players.find((p) => p.isAlive && p.id !== werewolf.id)!;
-state = recordVote(state, werewolf.id, werewolfVoteTarget.id);
-
-console.log('Final phase:', state.phaseData.phase);
-if (state.phaseData.phase === 'game-over') {
-  console.log('Winner:', state.phaseData.winner);
-}

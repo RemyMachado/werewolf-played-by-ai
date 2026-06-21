@@ -6,15 +6,18 @@
     "play": "tsx src/cli/play.ts",
     "npc": "tsx src/cli/npc-play.ts",
     "launch": "tsx src/cli/launch.ts",
+    "web": "tsx src/api/test-client.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "express": "^4.21.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0",

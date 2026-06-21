@@ -129,10 +129,10 @@ function roleSection(view: PlayerView): string {
         'Each night, AFTER the werewolves choose, you secretly learn who they are about to kill. You hold two potions, each usable only ONCE the entire game:',
         '- a HEALING potion that saves the wolves\' victim that night (you may even save yourself);',
         '- a POISON potion that kills any one player you choose.',
-        'You may use both, either, or neither on a given night. Spend them wisely — once a potion is gone it is gone.',
+        'You may use both, either, or neither on a given night. There are TWO opposite risks to balance: spend a potion too early or on the wrong person and it is gone when you most need it — but hold it too long and it is simply wasted, because a potion still in your hands when you are killed or when the game ends saved no one. Weigh both sides; do not just default to hoarding.',
         status,
         'On HEALING: your one save is most valuable spent on the SEER — the village\'s only source of hard facts. The wolves tend to kill whoever threatens them most, so their victim is often the Seer; if tonight\'s target looks like the Seer (they claimed it, or have been acting on real information), saving them is usually the strongest move. Saving an ordinary villager is rarely worth the potion. Only once the Seer is already dead (the role counts above tell you) does saving the next victim become worthwhile.',
-        'On POISON: spent on a villager it only helps the wolves, so keep it for a player you have hard, specific reason to believe is a werewolf. The targets and timing are yours.',
+        'On POISON: spent on a villager it only helps the wolves, so keep it for a player you have hard, specific reason to believe is a werewolf. But once you DO have a genuine suspect, remember an unused poison is wasted — holding out for a certainty that never comes is its own way to lose it. The target and timing are yours.',
         'Your role and your potion use are secret. Revealing you are the Witch can make you a target. You win when every werewolf has been eliminated.',
       ].join('\n');
     }
@@ -331,7 +331,7 @@ export function witchHealPrompt(view: PlayerView, memory: string, victimName: st
     );
   } else {
     parts.push(
-      `You may not know ${victimName}'s role for certain, but you are not in the dark: weigh whether they are worth saving from what they have actually said and done so far — their claims, their votes, who they have helped, accused, or been cleared by. The wolves chose to kill them for a reason; consider what that target choice suggests too.`,
+      `You may not know ${victimName}'s role for certain, but you are not in the dark: weigh whether they are worth saving from what they have actually said and done so far — their claims, their votes, who they have helped, accused, or been cleared by. The Seer is the most valuable player on the village team, and the wolves most often kill whoever threatens them most — so if ${victimName} is the player you believe is the Seer (they claimed it, or have clearly been acting on real information), this is exactly the moment your potion exists for: save them, do not let them die. Otherwise, judge whether this particular player is worth spending your one save on.`,
       '',
     );
   }

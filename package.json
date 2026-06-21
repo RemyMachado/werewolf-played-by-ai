@@ -1,0 +1,9 @@
+{
+  "name": "werewolf-played-by-ai",
+  "private": true,
+  "scripts": {
+    "dev:server": "pnpm --filter server dev",
+    "dev:client": "pnpm --filter client dev",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

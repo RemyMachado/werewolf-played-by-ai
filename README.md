@@ -17,20 +17,15 @@ You sit down in a fog-bound village. Some of your neighbours are werewolves. Eac
 each day everyone argues and lynches a suspect. Find the wolves before they outnumber you.
 
 The twist: **the other players are AI.** Every NPC is driven by a local model through
-[Ollama](https://ollama.com), each with its own private memory, reasoning, and agenda. They are *not*
-scripted — they're handed the rules, what they can legitimately see, and a single goal (**win**), then
-left to play. They bluff, they accuse, they defend their packmates, they waste their potions, they
-occasionally out themselves. No two games play the same.
+[Ollama](https://ollama.com), with its own private memory and agenda. They aren't scripted — they get
+the rules, what they can legitimately see, and a single goal (**win**), then play it out: bluffing,
+accusing, defending packmates, wasting potions, sometimes outing themselves.
 
 Roles in the box: **Villager · Werewolf · Seer · Witch.**
 
-## What makes it tick
-
-The other players aren't scripted. Each NPC gets the rules, its own private notes, and a single goal — win — and a local model works out the rest: what to say, who to trust, when to lie, how to vote. Every seat runs the same code, so whatever strategy turns up is the model's own.
-
-Hidden information is enforced where it counts. The server only ever sends a player what their role is allowed to know, so a living player's role never reaches the browser; there's nothing to dig out of the network tab.
-
-And it's meant to feel like a game rather than a dashboard. Players sit around a candlelit table through a day/night cycle, hand-drawn townsfolk over AI-painted backdrops, with the log colour-coded and the current speaker underlined. Since turns stream in live, you actually watch the wolves confer, the Seer investigate, and each villager weigh a vote before it lands.
+The interface is a 2D board that moves from night to day, and each NPC's turn plays out live as it
+happens. The server only ever sends you what your role is allowed to see, so another living player's
+role never reaches your browser.
 
 <table>
   <tr>
@@ -66,9 +61,6 @@ A pnpm monorepo, TypeScript end to end, Zod schemas as the single source of trut
 | **API** (`server/src/api`) | Express + **Server-Sent Events** (no WebSockets needed for one player) + plain HTTP for your answers. One in-memory session. |
 | **Web UI** (`client`) | React + Vite + **Framer Motion**. Procedural SVG characters, AI-generated backdrops/role cards, full `prefers-reduced-motion` support. |
 | **LLM** | [Ollama](https://ollama.com) locally — default `gemma4:e4b` (any format-friendly model works; `phi4`, `qwen2.5` are good too). |
-
-The slow, turn-by-turn cadence of a local model is treated as a feature: each NPC turn announces *who is acting*
-before its (multi-second) think, then reveals the result — anticipation, then payoff.
 
 ## Getting started
 

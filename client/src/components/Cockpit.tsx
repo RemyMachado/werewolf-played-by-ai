@@ -1,5 +1,6 @@
 import { PlayerView, Role } from '../types';
 import { roleLabel } from '../format';
+import { RoleCard } from './RoleCard';
 
 type Props = { view: PlayerView | null };
 
@@ -9,7 +10,7 @@ const ROLE_ORDER: Role[] = ['werewolf', 'seer', 'witch', 'villager'];
 // knows. Everything here comes from buildPlayerView, the server's hidden-info
 // boundary — living players' roles are never present.
 export function Cockpit({ view }: Props) {
-  if (!view) return <aside className="cockpit empty">No game yet.</aside>;
+  if (!view) return <p className="muted">No game yet.</p>;
 
   const remaining = ROLE_ORDER.filter((r) => view.composition[r] > 0).map((r) => {
     const dead = view.dead.filter((d) => d.role === r).length;
@@ -17,11 +18,14 @@ export function Cockpit({ view }: Props) {
   });
 
   return (
-    <aside className="cockpit">
-      <h2>
-        {view.self.name} <span className="role">{roleLabel(view.self.role)}</span>
-      </h2>
-      <div className="meta">Round {view.round}</div>
+    <>
+      <div className="self-card">
+        <RoleCard role={view.self.role} size={72} />
+        <div>
+          <h2>{view.self.name}</h2>
+          <div className="meta">Round {view.round}</div>
+        </div>
+      </div>
 
       <section>
         <h3>Roles remaining</h3>
@@ -80,6 +84,19 @@ export function Cockpit({ view }: Props) {
         </section>
       )}
 
+      {view.wolfChat.length > 0 && (
+        <section>
+          <h3>Pack discussion</h3>
+          <ul className="flat pack-chat">
+            {view.wolfChat.map((m, i) => (
+              <li key={i}>
+                <span className="chat-speaker">{m.speaker}:</span> {m.text}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {view.witchPotions && (
         <section>
           <h3>Potions</h3>
@@ -89,6 +106,6 @@ export function Cockpit({ view }: Props) {
           </ul>
         </section>
       )}
-    </aside>
+    </>
   );
 }

@@ -43,8 +43,10 @@ export type ServerEvent =
   | { type: 'view'; view: PlayerView }
   | { type: 'prompt'; prompt: PromptDto }
   | { type: 'activity'; label: string; actorId: string | null }
-  | { type: 'game-over'; winner: Team }
+  | { type: 'game-over'; winner: Team; roster: { id: string; name: string; role: Role }[] }
   | { type: 'error'; message: string };
+
+export type RosterEntry = { id: string; name: string; role: Role };
 
 export type ClientAnswer = { promptId: string; value: string | null | boolean };
 

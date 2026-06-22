@@ -22,3 +22,14 @@ export function buildSeats(view: PlayerView | null): SeatModel[] {
 }
 
 const num = (id: string): number => Number(id.replace(/\D/g, '')) || 0;
+
+// Where a seat sits on the table, as percentages of the board. Shared by the Table
+// and the FX overlay so speech bubbles and vote arrows line up exactly with seats.
+export function seatPos(index: number, total: number): { left: number; top: number } {
+  const angle = (index / Math.max(total, 1)) * 2 * Math.PI - Math.PI / 2; // start top, clockwise
+  return { left: 50 + 43 * Math.cos(angle), top: 50 + 45 * Math.sin(angle) };
+}
+
+export function seatIndex(seats: SeatModel[], id: string): number {
+  return seats.findIndex((s) => s.id === id);
+}

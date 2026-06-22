@@ -1,15 +1,16 @@
 :root {
   --text: #e9ecf2;
   --muted: #97a0b3;
-  --panel: rgba(22, 26, 35, 0.82);
-  --panel-2: #252b38;
+  --panel: rgba(16, 14, 20, 0.93);
+  --panel-2: #221b28;
   --line: rgba(255, 255, 255, 0.08);
   --wolf: #e0563f;
   --seer: #b07bdc;
   --witch: #4fb0a5;
   --villager: #6fae6f;
-  --gold: #e3b657;
-  --accent: #4f7fc4;
+  --gold: #d9b15a;
+  --accent: #6a4cc4;
+  --blood: #7d1f24;
 }
 
 * {
@@ -19,20 +20,48 @@
 body {
   margin: 0;
   color: var(--text);
-  font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #0a0810;
+  font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Day / night atmosphere ------------------------------------------------- */
-.app {
-  min-height: 100vh;
-  padding: 14px 18px 28px;
+/* Backdrop (fixed, behind everything) ----------------------------------- */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* behind ALL app content — a positioned z-index:0 would paint over in-flow elements */
+  pointer-events: none;
+  overflow: hidden;
+}
+.backdrop-grad {
+  position: absolute;
+  inset: 0;
   transition: background 1.2s ease;
 }
-.app.is-night {
-  background: radial-gradient(1200px 700px at 50% -10%, #2a2350 0%, #161528 45%, #0c0c16 100%);
+.backdrop-grad.night {
+  background: radial-gradient(1200px 720px at 50% -12%, #3a2030 0%, #1a1426 45%, #0a0810 100%);
 }
-.app.is-day {
-  background: radial-gradient(1200px 700px at 50% -10%, #5a73a8 0%, #36456a 45%, #1c2438 100%);
+.backdrop-grad.day {
+  background: radial-gradient(1200px 720px at 50% -12%, #4a4a5e 0%, #2c2a3a 45%, #14121c 100%);
+}
+.backdrop-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1.4s ease;
+}
+.backdrop-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* App shell -------------------------------------------------------------- */
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 14px 18px 28px;
 }
 
 header {
@@ -42,14 +71,16 @@ header {
   flex-wrap: wrap;
 }
 header h1 {
-  font-size: 20px;
+  font-size: 22px;
   margin: 0;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 8px #000;
 }
 .status {
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.45);
 }
 .status.on {
   color: #7dd39a;
@@ -58,7 +89,6 @@ header h1 {
   color: var(--muted);
 }
 
-/* New-game form ---------------------------------------------------------- */
 .new-game {
   display: flex;
   align-items: flex-end;
@@ -79,12 +109,19 @@ header h1 {
   gap: 4px;
   color: var(--text);
 }
-.new-game input {
-  background: rgba(0, 0, 0, 0.3);
+.new-game input,
+.new-game select {
+  background: rgba(0, 0, 0, 0.4);
   border: 1px solid var(--line);
   color: var(--text);
   border-radius: 6px;
-  padding: 5px 7px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 14px; /* explicit — must NOT inherit the 11px label caption size */
+}
+.new-game select option {
+  background: #1a1422;
+  color: var(--text);
 }
 .new-game input[type='number'] {
   width: 62px;
@@ -95,16 +132,16 @@ header h1 {
 
 button {
   background: var(--accent);
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 7px;
   padding: 8px 14px;
   cursor: pointer;
-  font-size: 14px;
+  font: inherit;
   font-weight: 600;
 }
 button:hover {
-  filter: brightness(1.12);
+  filter: brightness(1.15);
 }
 button.secondary {
   background: var(--panel-2);
@@ -119,13 +156,33 @@ button.secondary {
   text-align: center;
 }
 .banner.error {
-  background: #3a1d1d;
+  background: #3a1414;
   color: #ff9b8a;
 }
-.banner.over {
-  background: linear-gradient(90deg, #2a2350, #3a2e63);
+
+/* Narration now lives inside the table stage, with the other informative text. */
+.narrator {
+  text-align: center;
+  min-height: 18px;
+  margin: 6px 0 2px;
   color: var(--gold);
-  font-size: 18px;
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 6px #000;
+}
+.abandon {
+  margin-left: auto;
+  background: var(--blood);
+}
+.pack-chat li {
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+.chat-speaker {
+  color: var(--wolf);
+  font-weight: 600;
 }
 
 /* Layout ----------------------------------------------------------------- */
@@ -133,7 +190,7 @@ button.secondary {
   display: grid;
   grid-template-columns: 230px 1fr 300px;
   gap: 16px;
-  margin-top: 14px;
+  margin-top: 8px;
   align-items: start;
 }
 @media (max-width: 1000px) {
@@ -141,7 +198,6 @@ button.secondary {
     grid-template-columns: 1fr;
   }
 }
-
 .arena {
   display: flex;
   flex-direction: column;
@@ -151,7 +207,7 @@ button.secondary {
 .empty-arena {
   color: var(--muted);
   text-align: center;
-  padding: 80px 0;
+  padding: 90px 0;
 }
 
 /* The table -------------------------------------------------------------- */
@@ -159,16 +215,16 @@ button.secondary {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-height: 64vh;
+  max-height: 66vh;
   margin: 0 auto;
 }
 .table-felt {
   position: absolute;
-  inset: 13%;
+  inset: 16%;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, rgba(80, 120, 90, 0.28), rgba(20, 30, 25, 0.5));
-  border: 2px solid rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.55);
+  background: radial-gradient(circle at 50% 42%, rgba(26, 20, 34, 0.88), rgba(8, 6, 12, 0.94));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.65);
 }
 .table-center {
   position: absolute;
@@ -179,22 +235,23 @@ button.secondary {
   text-align: center;
 }
 
+/* Stage (table centre) -------------------------------------------------- */
 .stage-body {
-  font-size: 44px;
+  font-size: 46px;
   line-height: 1;
 }
 .stage.night .stage-body {
   color: #cfd3f5;
-  filter: drop-shadow(0 0 14px rgba(150, 160, 255, 0.5));
+  filter: drop-shadow(0 0 16px rgba(150, 160, 255, 0.55));
 }
 .stage.day .stage-body {
   color: var(--gold);
-  filter: drop-shadow(0 0 16px rgba(227, 182, 87, 0.55));
+  filter: drop-shadow(0 0 18px rgba(217, 177, 90, 0.6));
 }
 .stage-phase {
   margin-top: 6px;
   font-size: 12px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -209,7 +266,6 @@ button.secondary {
   animation: glow 1.4s ease-in-out infinite;
 }
 .thinking {
-  color: var(--text);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -233,30 +289,34 @@ button.secondary {
     opacity: 1;
   }
   50% {
-    opacity: 0.55;
+    opacity: 0.5;
   }
 }
 
 /* Seats ------------------------------------------------------------------ */
-.seat {
+.seat-anchor {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 92px;
+  width: 96px;
+}
+.seat {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
   user-select: none;
 }
-.seat .avatar {
+.avatar {
   position: relative;
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
 }
-.avatar-svg {
+.person-svg {
   display: block;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
 }
 .seat.me .avatar {
@@ -264,26 +324,17 @@ button.secondary {
   outline-offset: 2px;
 }
 .seat.dead {
-  opacity: 0.55;
+  opacity: 0.5;
 }
-.seat.dead .avatar-svg {
-  filter: grayscale(1);
-}
-.seat .skull {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: 30px;
-  color: #d7dae2;
-  text-shadow: 0 1px 3px #000;
+.seat.dead .person-svg {
+  filter: grayscale(1) brightness(0.8);
 }
 .seat .pulse {
   position: absolute;
   inset: -6px;
   border-radius: 50%;
   border: 2px solid var(--gold);
-  animation: pulse 1.2s ease-out infinite;
+  animation: pulse 1.3s ease-out infinite;
 }
 @keyframes pulse {
   0% {
@@ -291,29 +342,34 @@ button.secondary {
     opacity: 0.9;
   }
   100% {
-    transform: scale(1.25);
+    transform: scale(1.3);
     opacity: 0;
   }
 }
 .seat.acting .avatar {
-  box-shadow: 0 0 18px rgba(227, 182, 87, 0.8);
+  box-shadow: 0 0 20px rgba(217, 177, 90, 0.85);
+}
+.seat .reticle {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px dashed var(--blood);
+  animation: spin 9s linear infinite;
 }
 .seat.targetable {
   cursor: pointer;
 }
 .seat.targetable .avatar {
-  outline: 3px dashed var(--accent);
-  outline-offset: 2px;
-  animation: glow 1.4s ease-in-out infinite;
+  box-shadow: 0 0 22px rgba(125, 31, 36, 0.9);
 }
 .seat.targetable:hover .avatar {
-  outline-style: solid;
-  outline-color: var(--gold);
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
 }
 .seat-name {
   font-size: 13px;
   font-weight: 600;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 .seat-name .you {
   color: var(--gold);
@@ -326,7 +382,7 @@ button.secondary {
   font-size: 11px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
 }
 .role-badge.werewolf {
   color: var(--wolf);
@@ -341,39 +397,48 @@ button.secondary {
   color: var(--villager);
 }
 
-/* Action bar ------------------------------------------------------------- */
-.action-bar {
-  background: var(--panel);
-  backdrop-filter: blur(6px);
-  border: 1px solid var(--accent);
-  border-radius: 12px;
-  padding: 14px;
+/* FX overlay (speech bubbles, vote arrows) ------------------------------ */
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
-.action-question {
-  font-weight: 700;
-  margin-bottom: 10px;
+/* 💬 "spoke" marker over a seat — the line itself is read in History. */
+.speech-mark {
+  position: absolute;
+  transform: translate(-50%, -150%);
+  font-size: 24px;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.85));
 }
-.action-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
+/* 💭 thinking / other per-seat emoji markers (rendered inside the avatar). */
+.seat-mark {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.85));
+  pointer-events: none;
 }
-.hint {
-  color: var(--gold);
-  font-size: 13px;
-  margin-right: 6px;
+.seat-mark.thinking {
+  animation: bob 1.5s ease-in-out infinite;
 }
-.text-answer textarea {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--line);
-  color: var(--text);
-  border-radius: 8px;
-  padding: 8px;
-  margin-bottom: 8px;
-  resize: vertical;
-  font: inherit;
+@keyframes bob {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-3px);
+  }
+}
+.vote-arrow {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #b9404a, var(--blood));
+  box-shadow: 0 0 10px rgba(125, 31, 36, 0.9);
 }
 
 /* Side panels (cockpit + history) --------------------------------------- */
@@ -388,19 +453,18 @@ button.secondary {
 .cockpit.empty {
   color: var(--muted);
 }
-.cockpit h2 {
-  margin: 0 0 2px;
-  font-size: 17px;
+.self-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
-.cockpit h2 .role {
-  font-size: 12px;
-  color: var(--gold);
-  margin-left: 6px;
+.self-card h2 {
+  margin: 0;
+  font-size: 17px;
 }
 .cockpit .meta {
   color: var(--muted);
   font-size: 12px;
-  margin-bottom: 10px;
 }
 .cockpit section {
   border-top: 1px solid var(--line);
@@ -430,39 +494,298 @@ ul.flat li.self {
 .muted {
   color: var(--muted);
 }
-
-.history {
+/* Side panels: collapsible + resizable, both cockpit and history share this. */
+.side-panel {
   position: sticky;
   top: 14px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  /* Leave room for the app padding + header above so a long panel scrolls INTERNALLY
+     instead of pushing the page past 100vh and forcing a body scroll. */
+  max-height: calc(100vh - 110px);
 }
-.log {
-  height: 60vh;
+.side-panel.collapsed {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px 0;
+  align-items: center;
+  min-height: 110px;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.panel-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.panel-toggle {
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.side-panel-body {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  cursor: ew-resize;
+  z-index: 3;
+}
+.resize-handle.left {
+  right: -6px;
+}
+.resize-handle.right {
+  left: -6px;
+}
+.resize-handle:hover {
+  background: rgba(217, 177, 90, 0.22);
+}
+.log {
+  font-size: 14px;
+  line-height: 1.5;
+}
 .log .entry {
-  padding: 4px 0;
+  padding: 6px 2px;
   border-bottom: 1px solid var(--line);
 }
 .log .entry.speech {
-  color: #dde3ee;
+  color: #cdd3dd;
 }
 .log .entry.vote {
-  color: var(--muted);
   font-size: 13px;
+  color: var(--muted);
 }
 .log .entry.elimination {
-  color: var(--wolf);
-  font-weight: 600;
+  color: var(--text);
 }
 .log .entry.no-elimination {
   color: var(--muted);
   font-style: italic;
 }
+/* Player names in the log: bold, colour-coded once a role is known, underlined when
+   the player is the one speaking. */
+.ln-name {
+  font-weight: 700;
+  color: #ecdcba;
+}
+.ln-name.speaking {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+.ln-name.role-werewolf,
+.role-tag.role-werewolf {
+  color: var(--wolf);
+}
+.ln-name.role-seer,
+.role-tag.role-seer {
+  color: var(--seer);
+}
+.ln-name.role-witch,
+.role-tag.role-witch {
+  color: var(--witch);
+}
+.ln-name.role-villager,
+.role-tag.role-villager {
+  color: var(--villager);
+}
+.ln-text {
+  color: #cdd3dd;
+}
+.ln-colon {
+  color: var(--muted);
+}
+.ln-arrow {
+  color: var(--muted);
+  margin: 0 2px;
+}
+.ln-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+.role-tag {
+  font-weight: 700;
+}
 .log .divider {
   text-align: center;
-  color: var(--muted);
+  color: var(--gold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 12px;
-  margin: 12px 0 6px;
+  margin: 14px 0 6px;
+  opacity: 0.85;
+}
+
+/* Role card (image with SVG fallback) ----------------------------------- */
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.role-card img {
+  border-radius: 10px;
+  display: block;
+}
+.role-card-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  font-size: 40px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+}
+.role-card.werewolf .role-card-fallback {
+  color: var(--wolf);
+}
+.role-card.seer .role-card-fallback {
+  color: var(--seer);
+}
+.role-card.witch .role-card-fallback {
+  color: var(--witch);
+}
+.role-card.villager .role-card-fallback {
+  color: var(--villager);
+}
+.role-card-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* Action bar ------------------------------------------------------------- */
+.action-bar {
+  background: var(--panel);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 14px;
+}
+.action-question {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.action-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.hint {
+  color: var(--gold);
+  font-size: 13px;
+  margin-right: 6px;
+}
+.text-answer textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  resize: vertical;
+  font: inherit;
+}
+
+/* Finale ----------------------------------------------------------------- */
+.finale {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: #0a0810; /* fully opaque — never let the board show through */
+}
+.finale-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.6;
+}
+.finale-quit {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid var(--line);
+}
+.finale.wolves {
+  box-shadow: inset 0 0 240px rgba(125, 31, 36, 0.6);
+}
+.finale-body {
+  position: relative;
+  text-align: center;
+  padding: 24px;
+}
+.finale-body h2 {
+  font-size: 34px;
+  margin: 0 0 18px;
+  text-shadow: 0 2px 12px #000;
+}
+.finale.wolves h2 {
+  color: var(--wolf);
+}
+.finale.village h2 {
+  color: var(--gold);
+}
+.scoreboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  max-width: 760px;
+}
+.score-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.role-unknown {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-size: 11px;
+}
+.score-name {
+  font-size: 13px;
+}
+
+/* Reduced motion: kill all motion, keep the game fully legible ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

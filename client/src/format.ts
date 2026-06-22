@@ -1,4 +1,4 @@
-import { LogEntry, PlayerView, Role } from './types';
+import { LogEntry, Phase, PlayerView, Role } from './types';
 
 const ROLE_LABEL: Record<Role, string> = {
   villager: 'Villager',
@@ -19,6 +19,14 @@ export function isNightPhase(log: LogEntry[]): boolean {
   return true;
 }
 
+// The most recent phase the game entered, or null before the first phase-change.
+export function currentPhase(log: LogEntry[]): Phase | null {
+  for (let i = log.length - 1; i >= 0; i--) {
+    if (log[i].type === 'phase-change') return (log[i] as Extract<LogEntry, { type: 'phase-change' }>).phase;
+  }
+  return null;
+}
+
 // Resolves player ids to names using the human's view (every player is either alive
 // or dead in it, plus self), falling back to the raw id if somehow unknown.
 export function nameLookup(view: PlayerView | null): (id: string) => string {
@@ -29,6 +37,18 @@ export function nameLookup(view: PlayerView | null): (id: string) => string {
     for (const p of view.dead) map.set(p.id, p.name);
   }
   return (id) => map.get(id) ?? id;
+}
+
+// Resolves player ids to their role ONLY where it is legitimately known — the human
+// themselves and the dead (revealed on death). Living others return undefined, so the
+// log can colour known roles without ever leaking a living player's role.
+export function roleLookup(view: PlayerView | null): (id: string) => Role | undefined {
+  const map = new Map<string, Role>();
+  if (view) {
+    map.set(view.self.id, view.self.role);
+    for (const p of view.dead) map.set(p.id, p.role);
+  }
+  return (id) => map.get(id);
 }
 
 const CAUSE_VERB: Record<Extract<LogEntry, { type: 'elimination' }>['cause'], string> = {

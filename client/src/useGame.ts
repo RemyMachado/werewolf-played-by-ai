@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { startGame, submitAnswer } from './api';
-import { LogEntry, NewGameRequest, PlayerView, PromptDto, ServerEvent, Team } from './types';
+import { LogEntry, NewGameRequest, PlayerView, PromptDto, RosterEntry, ServerEvent, Team } from './types';
 
 export type Status = 'idle' | 'playing' | 'game-over' | 'error';
 
@@ -14,6 +14,7 @@ export type GameState = {
   prompt: PromptDto | null;
   activity: Activity | null; // live "who is acting now", or null when it's the human's turn / idle
   winner: Team | null;
+  roster: RosterEntry[] | null; // every player's true role, revealed at game over
   error: string | null;
 };
 
@@ -25,6 +26,7 @@ const EMPTY: GameState = {
   prompt: null,
   activity: null,
   winner: null,
+  roster: null,
   error: null,
 };
 
@@ -64,7 +66,7 @@ function reducer(state: GameState, action: Action): GameState {
         case 'activity':
           return { ...state, status: playing(state.status), activity: { label: e.label, actorId: e.actorId } };
         case 'game-over':
-          return { ...state, status: 'game-over', winner: e.winner, prompt: null, activity: null };
+          return { ...state, status: 'game-over', winner: e.winner, roster: e.roster, prompt: null, activity: null };
         case 'error':
           return { ...state, status: 'error', error: e.message, prompt: null, activity: null };
       }

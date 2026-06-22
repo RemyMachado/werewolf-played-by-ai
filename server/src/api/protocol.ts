@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LogEntrySchema, TeamSchema } from '../types/game';
+import { LogEntrySchema, RoleSchema, TeamSchema } from '../types/game';
 import { PlayerViewSchema } from '../npc/view';
 
 // The wire contract for the single-player web API: everything the server pushes to
@@ -56,8 +56,13 @@ export const ServerEventSchema = z.discriminatedUnion('type', [
   // is set only for public day actions (speaking/voting); night roles announce
   // generically (actorId null) so the Seer/Witch/wolves are never identified.
   z.object({ type: z.literal('activity'), label: z.string(), actorId: z.string().nullable() }),
-  // Terminal: the game ended with a winning team.
-  z.object({ type: z.literal('game-over'), winner: TeamSchema }),
+  // Terminal: the game ended. The roster reveals EVERY player's true role (the game
+  // is over, so the hidden-info boundary no longer applies).
+  z.object({
+    type: z.literal('game-over'),
+    winner: TeamSchema,
+    roster: z.array(z.object({ id: z.string(), name: z.string(), role: RoleSchema })),
+  }),
   // Terminal: the game aborted (e.g. the LLM failed). Carries an actionable message.
   z.object({ type: z.literal('error'), message: z.string() }),
 ]);

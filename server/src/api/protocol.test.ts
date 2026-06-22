@@ -23,7 +23,13 @@ describe('protocol schemas', () => {
     expect(ServerEventSchema.parse({ type: 'prompt', prompt: { kind: 'text', promptId: 'p', question: 'q' } }).type).toBe('prompt');
     expect(ServerEventSchema.parse({ type: 'activity', label: 'X is speaking…', actorId: 'p2' }).type).toBe('activity');
     expect(ServerEventSchema.parse({ type: 'activity', label: 'The Seer acts', actorId: null }).type).toBe('activity');
-    expect(ServerEventSchema.parse({ type: 'game-over', winner: 'villagers' }).type).toBe('game-over');
+    expect(
+      ServerEventSchema.parse({
+        type: 'game-over',
+        winner: 'villagers',
+        roster: [{ id: 'p1', name: 'Alice', role: 'seer' }],
+      }).type,
+    ).toBe('game-over');
     expect(ServerEventSchema.parse({ type: 'error', message: 'boom' }).type).toBe('error');
   });
 

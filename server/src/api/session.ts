@@ -157,7 +157,11 @@ export class GameSession {
     })
       .then((final) => {
         if (final.phaseData.phase === 'game-over') {
-          this.setTerminal({ type: 'game-over', winner: final.phaseData.winner });
+          this.setTerminal({
+            type: 'game-over',
+            winner: final.phaseData.winner,
+            roster: final.players.map((p) => ({ id: p.id, name: p.name, role: p.role })),
+          });
         } else {
           this.setTerminal({ type: 'error', message: 'the game ended without a winner' });
         }

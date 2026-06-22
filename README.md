@@ -2,7 +2,7 @@
 
 <p align="center">
   <em>A solo game of <strong>The Werewolves of Miller's Hollow</strong> where you are the only human at the table —
-  every other villager is a local LLM that talks, lies, deduces, and votes for itself.</em>
+  every other villager is a local LLM that talks, lies, deduces, and plays to win.</em>
 </p>
 
 <p align="center">
@@ -24,13 +24,13 @@ occasionally out themselves. No two games play the same.
 
 Roles in the box: **Villager · Werewolf · Seer · Witch.**
 
-## Highlights
+## What makes it tick
 
-- 🧠 **Genuinely autonomous NPCs** — one shared controller, one local model, per-player private memory. Strategy *emerges*; it is never hard-coded.
-- 🔒 **Real hidden information** — a server-side view boundary means the client (and you) only ever receive what your role is allowed to know. Living players' roles never cross the wire.
-- 🎭 **A 2D gothic game board** — a candlelit village square, day/night cycle, procedurally-drawn townsfolk, and AI-painted backdrops & role art.
-- ⏳ **Live "who's thinking" feedback** — watch the Seer scry, the wolves confer, and each villager mull their vote in real time over Server-Sent Events.
-- 📜 **A readable, dramatic log** — colour-coded names, the speaker underlined, roles revealed on death.
+The other players aren't scripted. Each NPC gets the rules, its own private notes, and a single goal — win — and a local model works out the rest: what to say, who to trust, when to lie, how to vote. Every seat runs the same code, so whatever strategy turns up is the model's own.
+
+Hidden information is enforced where it counts. The server only ever sends a player what their role is allowed to know, so a living player's role never reaches the browser; there's nothing to dig out of the network tab.
+
+And it's meant to feel like a game rather than a dashboard. Players sit around a candlelit table through a day/night cycle, hand-drawn townsfolk over AI-painted backdrops, with the log colour-coded and the current speaker underlined. Since turns stream in live, you actually watch the wolves confer, the Seer investigate, and each villager weigh a vote before it lands.
 
 <table>
   <tr>
@@ -130,5 +130,5 @@ client/
 
 ## Credits
 
-A personal experiment. Character & scene art generated with **Nano Banana (Gemini)**; everything else
-hand-built. Inspired by *The Werewolves of Miller's Hollow*.
+A personal experiment — vibe-coded in maybe ten hours. Character and scene art generated with
+**Nano Banana (Gemini)**. Inspired by *The Werewolves of Miller's Hollow*.
